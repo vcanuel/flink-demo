@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: flink-k8s-native-pod-monitor
+  labels:
+    release: prometheus
+spec:
+  podMetricsEndpoints:
+    - interval: 10s
+      path: /metrics
+      port: metrics-1
+  selector:
+    matchLabels:
+      app: flink01

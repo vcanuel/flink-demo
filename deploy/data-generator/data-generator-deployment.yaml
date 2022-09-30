@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-generator
+spec:
+  selector:
+    matchLabels:
+      app: data-generator
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: data-generator
+    spec:
+      containers:
+        - image: data-generator:1
+          name: data-generator

@@ -1,0 +1,48 @@
+apiVersion: flink.apache.org/v1beta1
+kind: FlinkDeployment
+metadata:
+  name: flink01
+spec:
+  image: flink01:1
+  flinkVersion: v1_15
+  flinkConfiguration:
+    taskmanager.numberOfTaskSlots: "2"
+    containerized.master.env.ENV_PROFILE: k8s
+    metrics.reporter.prom.class: org.apache.flink.metrics.prometheus.PrometheusReporter
+    metrics.reporter.prom.port: 9250-9251
+  podTemplate:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: pod-template
+    spec:
+      serviceAccount: flink
+      containers:
+        # Do not change the main container name
+        - name: flink-main-container
+          ports:
+            - containerPort: 9250
+              name: metrics-1
+              protocol: TCP
+            - containerPort: 9251
+              name: metrics-2
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /opt/flink/log
+              name: flink-logs
+      volumes:
+        - name: flink-logs
+          emptyDir: { }
+  serviceAccount: flink
+  jobManager:
+    resource:
+      memory: "2048m"
+      cpu: 1
+  taskManager:
+    resource:
+      memory: "2048m"
+      cpu: 1
+  job:
+    jarURI: local:///opt/flink/usrlib/spend-report.jar
+    parallelism: 1
+    upgradeMode: stateless

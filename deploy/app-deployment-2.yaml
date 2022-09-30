@@ -1,0 +1,25 @@
+apiVersion: flink.apache.org/v1beta1
+kind: FlinkDeployment
+metadata:
+  name: flink02
+spec:
+  image: flink01:1
+  flinkVersion: v1_15
+  flinkConfiguration:
+    taskmanager.numberOfTaskSlots: "2"
+    containerized.master.env.ENV_PROFILE: k8s
+    metrics.reporter.prom.class: org.apache.flink.metrics.prometheus.PrometheusReporter
+    metrics.reporter.prom.port: 9250-9251
+  serviceAccount: flink
+  jobManager:
+    resource:
+      memory: "2048m"
+      cpu: 1
+  taskManager:
+    resource:
+      memory: "2048m"
+      cpu: 1
+  job:
+    jarURI: local:///opt/flink/usrlib/spend-report.jar
+    parallelism: 1
+    upgradeMode: stateless
